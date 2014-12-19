@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link type="text/css" href="styles.css" rel="stylesheet" />
+    <link href="dist/sp-bootstrap.min.css" rel="stylesheet" media="screen">
+    <link rel="shortcut icon" href="images/favicon.png">
+    <title>The Elvis Influence</title>
+    <!-- Custom styles for this template -->
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+  <body >
+    <div class="navbar navbar-default" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="index.html">
+            <span class="navbar-logo">Spotify</span>
+            <span class="navbar-title">The Elvis Influence</span>
+          </a>
+        </div>
+        <div id="navbar" class="">
+          <div class="navbar-form navbar-right" role="form">
+            <div class="form-group">
+              <input id='artist' type="text" 
+              data-provide="typeahead" autocomplete="off" placeholder="Artist Name"
+              class="form-control typeahead">
+            </div>
+            <button id='go' type="button" class="btn btn-success">Go</button>
+          </div>
+        </div><!--/.navbar-collapse -->
+      </div>
+    </div>
+
+    <div id="playerModal" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span
+    aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title">From <span class="aname"></span> to Elvis</h4>
+          </div>
+          <div class="modal-body">
+        <iframe id="play-button"
+        src="https://embed.spotify.com/?uri=spotify:trackset:PREFEREDTITLE:5Z7ygHQo02SUrFmcgpwsKW,1x6ACsKV4UdWS2FMuPFUiT,4bi73jCM02fMpkI11Lqmfe" frameborder="0" allowtransparency="true" width="400" height="500"></iframe>
+              </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div id='info' class="h2 text-center"></div>
+    <div id='main' class="">
+      <div class="container-fluid col-xs-offset-1 col-xs-10" id="intro">
+            <h1> The Elvis Influence </h1>
+            <p class="lead">
+            See how your favorite band was influenced by 
+            Elvis Presley. Type the name of your favorite artist to see how
+            they are connected to The King of Rock and Roll.
+            </p>
+            <img alt='Elvis Presley - Library of Congress staff found no copyright in December 2000' src="images/elvis2.jpg">
+      </div>
+      <div class="container-fluid col-xs-offset-1 col-xs-10 text-center" id="top">
+        <div class="row">
+            <button class='btn btn-primary pull-left' id='listen'> Listen </button>
+        </div>
+        <div class="row">
+            <div id="results" class="col-centered"> </div>
+        </div>
+      </div>
+    </div>
+
+    <br clear="both">
+    <div id="footer">
+      <div class="container text-center">
+            <p class="text-muted">
+                Powered by <a href="http://spotify.com">Spotify</a>.
+                Created by <a href="http://twitter.com/plamere">@plamere</a>.
+            </p>
+      </div>
+    </div>
+    <script src="lib/jquery-1.11.1.min.js"></script>
+    <script src="lib/bootstrap.min.js"></script>
+    <script src="lib/underscore-min.js"></script>
+    <script src="lib/bootstrap3-typeahead.min.js"></script>
+<script>
+"use strict";
+
+var elvis = '43ZHCT0cAZBISjO8DG9PnE'; 
+var graph = { }
+var nameToIDs = {};
+var fullArtistInfo = {};
+var curID = null;
+
+function info(msg) {
+    $("#info").text(msg);
+}
+
+function error(msg) {
+    $("#info").text(msg);
+}
+
+function loadGraph(callback) {
+    $.getJSON('paths.json').then(
+        function(paths) {
+            var names = [];
+            _.each(paths, function(info, key) {
+                var name = info[0];
+                var next_key = info[1];
+                var dir = info[2];
+                names.push(name);
+                nameToIDs[name] = key;
+                var node = {
+                    key:key,
+                    name:name,
+                    next:next_key,
+                    dir:dir
+                }
+                graph[key] = node;
+            });
+            names.sort();
+            $("#artist").typeahead({source:names, autoSelect:false});
+            callback();
+        },
+        function() {
+            info("Trouble loading the graph");
+        }
+    );
+}
+
+
+var dir_name = {
+    '0': '',
+    '1': 'who was a member of',
+    '2': 'who was influenced by',
+    '3': 'who is similar to',
+    '-1': 'that had member',
+    '-2': 'who influenced',
+}
+
+function fetchImage(imgDiv, node) {
+    var url = "https://api.spotify.com/v1/artists/" + node.key;
+    $.getJSON(url).then(
+        function(results) {
+            var img = results.images[0].url;
+            node.img = img;
+            imgDiv.attr('src', node.img);
+            imgDiv.attr('width', '1000px');
+        },
+        function() {
+        }
+    )
+}
+
+function addArtist(div, id) {
+    var node = graph[id];
+    var type = dir_name[node.dir];
+    div.addClass("tadiv");
+    var sdiv = $("<div>");
+    var img = $("<img>");
+    img.addClass("img-responsive");
+    img.addClass("img-center");
+    if (node.img) {
+        img.attr('src', node.img);
+    } else {
+        fetchImage(img, node);
+    }
+    div.append(sdiv);
+    var h1 = $("<h1>");
+    var h3 = $("<h3>");
+
+    var a = $("<a>").text(node.name);
+    h1.append(a);
+    a.attr('href', 'https://open.spotify.com/artist/' + node.key);
+    a.attr('target', 'spotify');
+    sdiv.append(h1)
+    sdiv.append(img);
+    h3.text(type);
+    sdiv.append(h3)
+}
+
+
+function showPathToElvis(id) {
+    var results = $("#results");
+    results.empty();
+    $("#top").show();
+    info("");
+    curID = id;
+    $(".aname").text(graph[id].name);
+    while (id) {
+        var div = $("<span>");
+        results.append(div);
+        addArtist(div, id);
+        id = graph[id].next;
+    }
+}
+
+function searchArtist(artistName) {
+    $("#intro").hide();
+    if (artistName in nameToIDs) {
+        var id = nameToIDs[artistName];
+        showPathToElvis(id);
+    }  else { // poor man's slow search
+        var found = false;
+        var artistName = artistName.toLowerCase();
+        _.each(graph, function(artist, id) {
+            if (artistName === artist.name.toLowerCase()) {
+                found = true;
+                showPathToElvis(id);
+            }
+        });
+        if (!found) {
+            findSimilar(artistName);
+        }
+    }
+}
+
+function getSims(artist) {
+    var url = "https://api.spotify.com/v1/artists/" + artist.id + "/related-artists";
+    $.getJSON(url).then(
+        function(results) {
+            var found = false;
+            for (var i = 0; i < results.artists.length; i++) {
+                var sartist = results.artists[i];
+                if (sartist.id in graph) {
+                    var node = {
+                        key:artist.id,
+                        name:artist.name,
+                        next:sartist.id,
+                        dir: 3
+                    }
+                    graph[artist.id] = node;
+                    showPathToElvis(artist.id);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                info("Woah. Can't find a connection between Elvis and " + artist.name);
+            }
+        },
+        function()  {
+            info("bad sims");
+        }
+    );
+}
+
+function findSimilar(name) {
+    var url = "https://api.spotify.com/v1/search";
+    var params = {
+        q:name, 
+        limit:1,
+        type:"artist"
+    }
+    $.getJSON(url,params).then(
+        function(results) {
+            for (var i =0; i < results.artists.items.length; i++) {
+                var artist = results.artists.items[i];
+                fullArtistInfo[artist.id] = artist;
+                if (artist.id in graph) {
+                    showPathToElvis(artist.id);
+                } else {
+                    getSims(artist);
+                }
+            }
+        },
+        function()  {
+            info("bad sims");
+        }
+    );
+}
+
+function fetchTracks(node, callback) {
+    var url = "https://api.spotify.com/v1/artists/" + node.key + "/top-tracks";
+    $.getJSON(url, {country:'US'}).then(
+        function(results) {
+            console.log('fetchtracks', node, results);
+            node.tracks = [];
+            _.each(results.tracks, function(track) {
+                node.tracks.push(track.id);
+            });
+            callback();
+        },
+        function() {
+        }
+    );
+}
+
+
+function populateTracks(id, callback) {
+    if (id) {
+        var node = graph[id];
+        if (node.tracks == undefined) {
+            fetchTracks(node, function() {
+                var next = graph[id].next;
+                if (next) {
+                    populateTracks(next, callback);
+                } else {
+                    callback();
+                }
+            });
+        } else {
+            var next = graph[id].next;
+            if (next) {
+                populateTracks(next, callback);
+            } else {
+                callback();
+            }
+        }
+    }
+}
+
+function path_length(id) {
+    var count = 0;
+    while (id) {
+        count++;
+        id = graph[id].next;
+    }
+    return count;
+}
+
+function make_playlist(id) {
+    var min_size = 8;
+    var nartists = path_length(id);
+    var tracks_per_artist = Math.ceil(min_size / nartists);
+    var tracks = [];
+
+    while (id) {
+        var node = graph[id];
+        var atracks = _.sample(node.tracks, tracks_per_artist);
+        _.each(atracks, function(track) {
+            tracks.push(track);
+        });
+        id = node.next;
+    }
+    return tracks;
+}
+
+function initUI() {
+    $("#top").hide();
+    $("#artist").on('change', function() {
+        var artist = $("#artist").val();
+        searchArtist(artist);
+    });
+
+    $("#go").on('click', function() {
+        var artist = $("#artist").val();
+        searchArtist(artist);
+    });
+
+    $("#listen").on('click', function() {
+        var options = { keyboard:true };
+        populateTracks(curID, function() {
+            var tracks = make_playlist(curID);
+            var title = encodeURIComponent('From ' + graph[curID].name  + "  Elvis");
+            var uri = 'https://embed.spotify.com/?uri=spotify:trackset:' + title + ':'
+                       + tracks.join(',');
+            $("#play-button").attr('src', uri);
+            $('#playerModal').modal(options)
+        })
+    });
+}
+
+$(document).ready(
+    function() {
+        initUI();
+        loadGraph(function() {
+        });
+    }
+);
+
+</script>
+</body>
+</html>

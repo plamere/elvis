@@ -1,0 +1,28 @@
+.tadiv {    
+    width:95%;
+    text-align:center;
+}
+
+.tadiv h1 {
+    font-size:96px;
+}
+
+#main {
+    /*
+    background-image: url(images/elvis.jpg);
+    background-repeat:no-repeat;
+    */
+}
+
+#intro h1 {
+    font-size:76px;
+}
+
+.img-center { 
+    margin: 0 auto;
+}
+
+body .modal-dialog {
+    width:450px;
+    margin-left:0px;
+}
