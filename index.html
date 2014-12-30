@@ -62,14 +62,21 @@
             <h1> The Elvis Influence </h1>
             <p class="lead">
             See how your favorite band was influenced by 
-            Elvis Presley. Type the name of your favorite artist to see how
+            Elvis Presley. Type the name of your favorite artist from
+            <a href="?q=One+Direction"> One Direction </a> to
+            <a href="?q=Lana+Del+Rey">Lana Del Rey</a> to
+            to see how
             they are connected to The King of Rock and Roll.
+            <p>
+            Check out this <a
+            href="elvisualization.html">Elvisualization</a> that shows how some of today's top artists are 
+            connected to Elvis.
             </p>
             <img alt='Elvis Presley - Library of Congress staff found no copyright in December 2000' src="images/elvis2.jpg">
       </div>
       <div class="container-fluid col-xs-offset-1 col-xs-10 text-center" id="top">
         <div class="row">
-            <button class='btn btn-primary pull-left' id='listen'> Listen </button>
+            <button class='btn btn-primary' id='listen'> Listen </button>
         </div>
         <div class="row">
             <div id="results" class="col-centered"> </div>
@@ -140,7 +147,7 @@ var dir_name = {
     '0': '',
     '1': 'who was a member of',
     '2': 'who was influenced by',
-    '3': 'who is similar to',
+    '3': 'that is similar to',
     '-1': 'that had member',
     '-2': 'who influenced',
 }
@@ -203,6 +210,10 @@ function showPathToElvis(id) {
 }
 
 function searchArtist(artistName) {
+    $("#artist").val(artistName);
+    var p = '?q=' + encodeURI(artistName);
+    history.replaceState({}, document.title, p);
+
     $("#intro").hide();
     if (artistName in nameToIDs) {
         var id = nameToIDs[artistName];
@@ -343,6 +354,29 @@ function make_playlist(id) {
     return tracks;
 }
 
+function urldecode(str) {
+   return decodeURIComponent((str+'').replace(/\+/g, '%20'));
+}
+
+function processParams() {
+    var params = {};
+    var q = document.URL.split('?')[1];
+    if(q != undefined){
+        q = q.split('&');
+        for(var i = 0; i < q.length; i++){
+            var pv = q[i].split('=');
+            var p = pv[0];
+            var v = pv[1];
+            params[p] = urldecode(v);
+        }
+    }
+    if ('q' in params) {
+        var name = params['q'];
+        $("#artist").val(name);
+        searchArtist(name);
+    }
+}
+
 function initUI() {
     $("#top").hide();
     $("#artist").on('change', function() {
@@ -372,6 +406,7 @@ $(document).ready(
     function() {
         initUI();
         loadGraph(function() {
+            processParams();
         });
     }
 );

@@ -1,56 +1,55 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<style>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link type="text/css" href="visstyles.css" rel="stylesheet" />
+    <link href="dist/sp-bootstrap.min.css" rel="stylesheet" media="screen">
+    <link rel="shortcut icon" href="images/favicon.png">
+    <title>The Elvis Influence</title>
+    <!-- Custom styles for this template -->
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+  <body>
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="index.html">
+            <span class="navbar-logo">Spotify</span>
+            <span class="navbar-title">The Elvis Influence</span>
+          </a>
+        </div>
+      </div>
+    </div>
 
+    <div class="bad-col-sm-12" id='main'></div>
 
-body {
-    background:#1c1c1f;
-    color:white;
-}
-
-
-node .selected2 {
-    font: 14px sans-serif;
-    font-weight:bold;
-    color:red;
-}
-
-.node {
-  cursor: pointer;
-  background:red;
-}
-
-.node circle {
-  fill: #1f1;
-  stroke: #bd6100;
-  stroke-width: 2.0px;
-}
-
-.node text {
-  font: 11px sans-serif;
-  fill:#00778f;
-}
-
-.link {
-  fill: none;
-  stroke: #242;
-  stroke-width: 1.5px;
-}
-
-</style>
-<body>
-<h1> The Elvis Influence on modern music </h1>
-
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="lib/jquery-1.11.1.min.js"></script>
-<script src="lib/underscore-min.js"></script>
-<script src="http://d3js.org/d3.v3.min.js"></script>
+    <br clear="both">
+    <div id="footer">
+      <div class="container text-center">
+            <p class="text-muted">
+                Powered by <a href="http://spotify.com">Spotify</a>.
+                Created by <a href="http://twitter.com/plamere">@plamere</a>.
+            </p>
+      </div>
+    </div>
+    <script src="lib/jquery-1.11.1.min.js"></script>
+    <script src="lib/bootstrap.min.js"></script>
+    <script src="lib/underscore-min.js"></script>
+    <script src="lib/d3.v3.min.js"></script>
 <script>
 
 var audio = $("<audio>");
 
-var margin = {top: 20, right: 120, bottom: 20, left: 120},
-    width = 960 - margin.right - margin.left,
+var margin = {top: 20, right: 120, bottom: 20, left: 140},
+    width = 1400 - margin.right - margin.left,
     height = 10000 - margin.top - margin.bottom;
     
 var i = 0,
@@ -63,9 +62,10 @@ var tree = d3.layout.tree()
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x]; });
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#main").append("svg")
     .attr("width", width + margin.right + margin.left)
     .attr("height", height + margin.top + margin.bottom)
+    .attr("class", "d3-main-svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -110,24 +110,7 @@ function update(source) {
   var nodeEnter = node.enter().append("g")
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + source.y0 + "," +
-source.x0 + ")"; })
-    .on("mouseover", function() {
-        var theNode = d3.select(this);
-        theNode.classed('selected2', true);
-        console.log('mouseover', this, theNode);
-    })
-    .on("mouseout", function() {
-        var theNode = d3.select(this);
-        theNode.classed('selected2', false);
-        console.log('mouseout', theNode);
-    }).
-    on("click", function(d) {
-        console.log('clicked d', d);
-        playTracks(d);
-        var theNode = d3.select(this);
-        theNode.classed('selected2', true);
-        //click(d);
-    });
+source.x0 + ")"; });
 
   nodeEnter.append("circle")
       .attr("r", 1e-6)
@@ -138,8 +121,24 @@ source.x0 + ")"; })
       .attr("dy", ".35em")
       .attr("text-anchor", function(d) { return d.children || d._children ?
 "end" : "start"; })
+      .classed('larger', function(d) { return true ? d.name == "Elvis Presley" : 'normal'})
       .text(function(d) { return d.name; })
-      .style("fill-opacity", 1e-6);
+      .style("fill-opacity", 1e-6)
+
+    .on("mouseover", function() {
+        var theNode = d3.select(this);
+        theNode.classed('selected2', true);
+    })
+    .on("mouseout", function() {
+        var theNode = d3.select(this);
+        theNode.classed('selected2', false);
+    }).
+    on("click", function(d) {
+        playTracks(d);
+        var theNode = d3.select(this);
+        theNode.classed('selected2', true);
+        //click(d);
+    });
 
   // Transition nodes to their new position.
   var nodeUpdate = node.transition()
@@ -229,7 +228,6 @@ function playNext(artist) {
 }
 
 function playTracks(artist) {
-    console.log('playing tracks for', artist.name);
     if (artist.tracks) {
         playNext(artist);
     } else {
@@ -241,7 +239,6 @@ function playTracks(artist) {
                     artist.tracks.push(track.preview_url);
                 });
                 playNext(artist);
-                console.log('tracks', response);
             },
             function() {
                 error('get top track trouble');
@@ -252,7 +249,5 @@ function playTracks(artist) {
 
 
 </script>
-
 </body>
 </html>
-

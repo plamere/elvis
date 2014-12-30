@@ -2162,26 +2162,9 @@
                                             "name": "Steve Angello", 
                                             "children": [
                                                 {
-                                                    "aid": "7urnl0uH1w3NCoErxw7AUK", 
-                                                    "name": "Supermode", 
-                                                    "children": [
-                                                        {
-                                                            "aid": "1xNmvlEiICkRlRGqlNFZ43", 
-                                                            "name": "Axwell", 
-                                                            "children": []
-                                                        }
-                                                    ]
-                                                }, 
-                                                {
                                                     "aid": "1h6Cn3P4NGzXbaXidqURXs", 
                                                     "name": "Swedish House Mafia", 
-                                                    "children": [
-                                                        {
-                                                            "aid": "6hyMWrxGBsOx6sWcVj1DqP", 
-                                                            "name": "Sebastian Ingrosso", 
-                                                            "children": []
-                                                        }
-                                                    ]
+                                                    "children": []
                                                 }
                                             ]
                                         }
