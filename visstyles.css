@@ -1,0 +1,48 @@
+
+#main {
+    margin-top:64px;
+    /*background-color:rgb(47,47,47);*/
+    color:white;
+}
+
+
+.d3-main-svg {
+}
+
+body {
+    background-color:rgb(27,27,27) !important;
+}
+
+.node .selected2 {
+    font-weight:bold;
+    fill: #bd6100;
+}
+
+.node {
+  cursor: pointer;
+  background:red;
+}
+
+.node circle {
+  fill: #1f1;
+  stroke: #bd6100;
+  stroke-width: 2.0px;
+}
+
+.node text {
+  font: 11px sans-serif;
+  /*fill:#00778f;*/
+  fill:#2299bf;
+}
+
+.larger {
+  font: 18px sans-serif !important;
+}
+
+.link {
+  fill: none;
+  stroke: #242;
+  stroke-opacity: .8;
+  stroke-width: 2.0px;
+}
+
