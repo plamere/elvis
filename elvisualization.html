@@ -119,25 +119,38 @@ source.x0 + ")"; });
   nodeEnter.append("text")
       .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
       .attr("dy", ".35em")
+      .attr("id", function(d) { return "aid-" + d.aid; })
       .attr("text-anchor", function(d) { return d.children || d._children ?
 "end" : "start"; })
       .classed('larger', function(d) { return true ? d.name == "Elvis Presley" : 'normal'})
       .text(function(d) { return d.name; })
       .style("fill-opacity", 1e-6)
 
-    .on("mouseover", function() {
-        var theNode = d3.select(this);
-        theNode.classed('selected2', true);
+    .on("mouseover", function(d) {
+        while (d) {
+            var ln = d3.select("#link_to_" + d.aid);
+            ln.classed('hlink', true);
+            var ln2 = d3.select("#aid-" + d.aid);
+            ln2.classed('selected2', true);
+            d = d.parent;
+        }
     })
-    .on("mouseout", function() {
-        var theNode = d3.select(this);
-        theNode.classed('selected2', false);
+    .on("mouseout", function(d) {
+        //var theNode = d3.select(this);
+        //theNode.classed('selected2', false);
+        while (d) {
+            var ln = d3.select("#link_to_" + d.aid);
+            ln.classed('hlink', false);
+
+            var ln2 = d3.select("#aid-" + d.aid);
+            ln2.classed('selected2', false);
+            d = d.parent;
+        }
     }).
     on("click", function(d) {
         playTracks(d);
         var theNode = d3.select(this);
         theNode.classed('selected2', true);
-        //click(d);
     });
 
   // Transition nodes to their new position.
@@ -174,6 +187,7 @@ source.x + ")"; })
   // Enter any new links at the parent's previous position.
   link.enter().insert("path", "g")
       .attr("class", "link")
+      .attr("id", function(d) { return 'link_to_' + d.target.aid })
       .attr("d", function(d) {
         var o = {x: source.x0, y: source.y0};
         return diagonal({source: o, target: o});

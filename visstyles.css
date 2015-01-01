@@ -46,3 +46,10 @@ body {
   stroke-width: 2.0px;
 }
 
+.hlink {
+  fill: none;
+  stroke: #842;
+  stroke-opacity: .8;
+  stroke-width: 4.0px;
+}
+

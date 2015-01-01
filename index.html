@@ -145,11 +145,11 @@ function loadGraph(callback) {
 
 var dir_name = {
     '0': '',
-    '1': 'who was a member of',
-    '2': 'who was influenced by',
-    '3': 'that is similar to',
-    '-1': 'that had member',
-    '-2': 'who influenced',
+    '1': 'was a member of',
+    '2': 'was influenced by',
+    '3': 'is similar to',
+    '-1': 'had member',
+    '-2': 'influenced',
 }
 
 function fetchImage(imgDiv, node) {
@@ -166,9 +166,11 @@ function fetchImage(imgDiv, node) {
     )
 }
 
-function addArtist(div, id) {
+function addArtist(div, id, which) {
     var node = graph[id];
-    var type = dir_name[node.dir];
+    var link_type = dir_name[node.dir];
+    var prefix = which === 0 ? '' : link_type.length > 0 ? 'who ' : '';
+    var type = prefix + link_type;
     div.addClass("tadiv");
     var sdiv = $("<div>");
     var img = $("<img>");
@@ -201,11 +203,13 @@ function showPathToElvis(id) {
     info("");
     curID = id;
     $(".aname").text(graph[id].name);
+    var which = 0;
     while (id) {
         var div = $("<span>");
         results.append(div);
-        addArtist(div, id);
+        addArtist(div, id, which);
         id = graph[id].next;
+        which ++;
     }
 }
 
