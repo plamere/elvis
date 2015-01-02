@@ -53,3 +53,9 @@ body {
   stroke-width: 4.0px;
 }
 
+.hlink2 {
+  fill: none;
+  stroke: #a4a;
+  stroke-opacity: .8;
+  stroke-width: 2.0px;
+}

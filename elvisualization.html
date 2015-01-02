@@ -49,12 +49,14 @@
 var audio = $("<audio>");
 
 var margin = {top: 20, right: 120, bottom: 20, left: 140},
-    width = 1400 - margin.right - margin.left,
+    width = 1200 - margin.right - margin.left,
     height = 10000 - margin.top - margin.bottom;
     
 var i = 0,
     duration = 750,
     root;
+
+var curNode = null;
 
 var tree = d3.layout.tree()
     .size([height, width]);
@@ -87,7 +89,7 @@ d3.json("elvis-mega.json", function(error, flare) {
     }
   }
 
-  // root.children.forEach(collapse);
+  //root.children.forEach(collapse);
   update(root);
 });
 
@@ -148,9 +150,15 @@ source.x0 + ")"; });
         }
     }).
     on("click", function(d) {
+        if (curNode) {
+            highlightPath(curNode, 'hlink2', false);
+        }
+        curNode = d;
         playTracks(d);
         var theNode = d3.select(this);
-        theNode.classed('selected2', true);
+        //theNode.classed('selected2', true);
+        highlightPath(d, 'hlink2', true);
+        // collapseNode(d);
     });
 
   // Transition nodes to their new position.
@@ -214,8 +222,19 @@ source.x + ")"; })
   });
 }
 
+function highlightPath(d, cls, state) {
+    while (d) {
+        var ln = d3.select("#link_to_" + d.aid);
+        ln.classed(cls, state);
+
+        var ln2 = d3.select("#aid-" + d.aid);
+        ln2.classed('selected2', state);
+        d = d.parent;
+    }
+}
+
 // Toggle children on click.
-function click(d) {
+function collapseNode(d) {
   if (d.children) {
     d._children = d.children;
     d.children = null;
