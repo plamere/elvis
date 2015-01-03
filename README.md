@@ -10,6 +10,9 @@ playlist of the path to Elvis.
 
 The Elvis Influence is online at TBD
 
+Also included with the app is a graph-oriented visualization for the top
+800 or so artists.
+
 It makes use of the Spotify Web API.
 
 
