@@ -1,6 +1,6 @@
 
 #main {
-    margin-top:64px;
+    margin-top:4px;
     /*background-color:rgb(47,47,47);*/
     color:white;
 }
@@ -8,6 +8,13 @@
 
 .d3-main-svg {
 }
+
+
+.info {
+    margin-top:78px;
+    color:rgb(200,200,200);
+}
+
 
 body {
     background-color:rgb(27,27,27) !important;
