@@ -26,3 +26,6 @@ body .modal-dialog {
     width:450px;
     margin-left:0px;
 }
+
+.clear {clear: both;}
+

@@ -37,7 +37,7 @@
     </div>
 
     <div id='main'></div>
-    <br clear="both">
+    <div class="clear"></div>
 
     <div id="footer">
       <div class="container text-center">
@@ -52,6 +52,7 @@
                 Created by <a href="http://twitter.com/plamere">@plamere</a>.
             </p>
       </div>
+    </div>
     <script src="lib/jquery-1.11.1.min.js"></script>
     <script src="lib/bootstrap.min.js"></script>
     <script src="lib/underscore-min.js"></script>
@@ -83,26 +84,11 @@ var svg = d3.select("#main").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-function zoom() {
-  svg.attr("transform", "translate(" + d3.event.translate + ")scale(" +
-  d3.event.scale + ")");
-  }
-
-d3.json("elvis-mega.json", function(error, flare) {
-  root = flare;
-  root.x0 = height / 2;
-  root.y0 = 0;
-
-  function collapse(d) {
-    if (d.children) {
-      d._children = d.children;
-      d._children.forEach(collapse);
-      d.children = null;
-    }
-  }
-
-  //root.children.forEach(collapse);
-  update(root);
+d3.json("elvis-mega.json", function(error, elvis) {
+    root = elvis;
+    root.x0 = height / 2;
+    root.y0 = 0;
+    update(root);
 });
 
 d3.select(self.frameElement).style("height", "800px");
@@ -124,7 +110,7 @@ function update(source) {
   var nodeEnter = node.enter().append("g")
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + source.y0 + "," +
-source.x0 + ")"; });
+            source.x0 + ")"; });
 
   nodeEnter.append("circle")
       .attr("r", 1e-6)
@@ -134,9 +120,8 @@ source.x0 + ")"; });
       .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
       .attr("dy", ".35em")
       .attr("id", function(d) { return "aid-" + d.aid; })
-      .attr("text-anchor", function(d) { return d.children || d._children ?
-"end" : "start"; })
-      .classed('larger', function(d) { return true ? d.name == "Elvis Presley" : 'normal'})
+      .attr("text-anchor", function(d) { return d.children || d._children ?  "end" : "start"; })
+      .classed('larger', function(d) { return true ? d.name == "Elvis Presley" : 'normal' })
       .text(function(d) { return d.name; })
       .style("fill-opacity", 1e-6)
 
@@ -149,9 +134,8 @@ source.x0 + ")"; });
             d = d.parent;
         }
     })
+
     .on("mouseout", function(d) {
-        //var theNode = d3.select(this);
-        //theNode.classed('selected2', false);
         while (d) {
             var ln = d3.select("#link_to_" + d.aid);
             ln.classed('hlink', false);
@@ -160,8 +144,9 @@ source.x0 + ")"; });
             ln2.classed('selected2', false);
             d = d.parent;
         }
-    }).
-    on("click", function(d) {
+    })
+
+    .on("click", function(d) {
         if (curNode) {
             highlightPath(curNode, 'hlink2', false);
         }
@@ -170,19 +155,16 @@ source.x0 + ")"; });
         var theNode = d3.select(this);
         //theNode.classed('selected2', true);
         highlightPath(d, 'hlink2', true);
-        // collapseNode(d);
     });
 
   // Transition nodes to their new position.
   var nodeUpdate = node.transition()
       .duration(duration)
-      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x +
-")"; });
+      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
   nodeUpdate.select("circle")
       .attr("r", 4.5)
-      .style("fill", function(d) { return d._children ? "lightsteelblue" :
-"#fff"; });
+      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
 
   nodeUpdate.select("text")
       .style("fill-opacity", 1);
@@ -190,8 +172,7 @@ source.x0 + ")"; });
   // Transition exiting nodes to the parent's new position.
   var nodeExit = node.exit().transition()
       .duration(duration)
-      .attr("transform", function(d) { return "translate(" + source.y + "," +
-source.x + ")"; })
+      .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
       .remove();
 
   nodeExit.select("circle")
@@ -243,18 +224,6 @@ function highlightPath(d, cls, state) {
         ln2.classed('selected2', state);
         d = d.parent;
     }
-}
-
-// Toggle children on click.
-function collapseNode(d) {
-  if (d.children) {
-    d._children = d.children;
-    d.children = null;
-  } else {
-    d.children = d._children;
-    d._children = null;
-  }
-  update(d);
 }
 
 function error(msg) {

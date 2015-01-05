@@ -66,3 +66,5 @@ body {
   stroke-opacity: .8;
   stroke-width: 2.0px;
 }
+
+.clear {clear: both;}
