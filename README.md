@@ -8,11 +8,11 @@ band membership back (or forward) to Elvis Presley. The path to Elvis is
 highlighted by high quality artist imagery. Press the 'listen' button to hear a
 playlist of the path to Elvis.
 
-The Elvis Influence is online at TBD
+The Elvis Influence is online at http://static.echonest.com/insights/elvis/elvisualization.html.
 
 Also included with the app is a graph-oriented visualization for the top
 800 or so artists.
 
-It makes use of the Spotify Web API.
+It makes use of the [Spotify Web API](https://developer.spotify.com/web-api/).
 
 
